@@ -5,8 +5,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -27,7 +25,6 @@ public class VentanaPrincipal extends JFrame implements ActionListener{
 	private JTextArea jTextArea;
     private JButton jButtonLimpiar;
 	private SimuladorControlador simuladorControlador;
-	//private List<Logueo> logueos;
 
 	/**
 	 * Launch the application.
@@ -88,9 +85,14 @@ public class VentanaPrincipal extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent evento) {
 
 		if (evento.getSource() == jButtonEjecutar) {
+			
+			this.jTextArea.setText("");
+			
+			
 			this.simuladorControlador = new SimuladorControlador();
 			this.simuladorControlador.ejecutar();
 			
+			this.jTextArea.setText(simuladorControlador.getLogueoInicial().getTexto());				
 			ArrayList<Logueo> logueos = (ArrayList<Logueo>) this.simuladorControlador.getLogueos();
 			
 			if (this.simuladorControlador.getLogueos() != null) {
@@ -99,6 +101,8 @@ public class VentanaPrincipal extends JFrame implements ActionListener{
 				}
 								
 			}
+			
+			this.jTextArea.setText(this.jTextArea.getText().concat(simuladorControlador.getLogueoFinal().getTexto()));	
 		}
 		
 		if(evento.getSource() == jButtonLimpiar) {
