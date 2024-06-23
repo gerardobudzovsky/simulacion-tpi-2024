@@ -8,6 +8,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 
@@ -17,6 +19,9 @@ public class VentanaPrincipal extends JFrame implements ActionListener{
 	private JPanel contentPane;
 	private JLabel jLabelTituloPrincipal;
 	private JButton jButtonEjecutar;
+	private JScrollPane jScrollPane;
+	private JTextArea jTextArea;
+    private JButton jButtonLimpiar;
 
 	/**
 	 * Launch the application.
@@ -34,9 +39,6 @@ public class VentanaPrincipal extends JFrame implements ActionListener{
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public VentanaPrincipal() {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setBounds(50, 50, 1024, 768);
@@ -59,6 +61,20 @@ public class VentanaPrincipal extends JFrame implements ActionListener{
 		this.jButtonEjecutar.addActionListener(this);
 		this.contentPane.add(jButtonEjecutar);
 		
+		this.jTextArea = new JTextArea();
+		this.jTextArea.setEditable(false);
+		
+		this.jScrollPane = new JScrollPane(jTextArea);
+		this.jScrollPane.setBounds(29, 237, 975, 488);
+		this.contentPane.add(jScrollPane);
+		
+		this.jButtonLimpiar = new JButton("Limpiar");
+		this.jButtonLimpiar.setToolTipText("Limpiar el Area de Texto");
+		this.jButtonLimpiar.setFont(new Font("SansSerif", Font.PLAIN, 13));
+		this.jButtonLimpiar.setBounds(178, 173, 85, 23);
+		this.jButtonLimpiar.addActionListener(this);
+		this.contentPane.add(jButtonLimpiar);
+		
 
 	}
 
@@ -66,9 +82,12 @@ public class VentanaPrincipal extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent evento) {
 
 		if (evento.getSource() == jButtonEjecutar) {
-			this.jLabelTituloPrincipal.setText("Prueba boton Ejecutar");		
+			this.jTextArea.setText("Prueba Text Area");			
 			
-
+		}
+		
+		if(evento.getSource() == jButtonLimpiar) {
+			this.jTextArea.setText("");	
 		}
 		
 	}
