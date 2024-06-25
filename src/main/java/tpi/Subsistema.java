@@ -136,4 +136,22 @@ public class Subsistema {
 		this.porcentajeDeTiempoOcioso = porcentajeDeTiempoOcioso;
 	}
 
+	@Override
+	public String toString() {
+		return "Subsistema{" +
+				"identificador=" + identificador +
+				", cantidadDePersonasQuePasaron=" + cantidadDePersonasQuePasaron +
+				", cantidadDePersonas=" + cantidadDePersonas +
+				", tiempoDeProximaSalida=" + tiempoDeProximaSalida +
+				", sumatoriaDeTiempoDePermanencia=" + sumatoriaDeTiempoDePermanencia +
+				", sumatoriaDeTiempoDeAtencion=" + sumatoriaDeTiempoDeAtencion +
+				", sumatoriaDeTiempoOcioso=" + sumatoriaDeTiempoOcioso +
+				", comienzoDeTiempoOcioso=" + comienzoDeTiempoOcioso +
+				", promedioDePermanencia=" + promedioDePermanencia +
+				", promedioDeEsperaEnCola=" + promedioDeEsperaEnCola +
+				", promedioDeTiempoDeAtencion=" + promedioDeTiempoDeAtencion +
+				", porcentajeDeTiempoOcioso=" + porcentajeDeTiempoOcioso +
+				'}';
+	}
+
 }
