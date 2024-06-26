@@ -146,11 +146,6 @@ public class Subsistema {
 				", sumatoriaDeTiempoDePermanencia=" + sumatoriaDeTiempoDePermanencia +
 				", sumatoriaDeTiempoDeAtencion=" + sumatoriaDeTiempoDeAtencion +
 				", sumatoriaDeTiempoOcioso=" + sumatoriaDeTiempoOcioso +
-				", comienzoDeTiempoOcioso=" + comienzoDeTiempoOcioso +
-				", promedioDePermanencia=" + promedioDePermanencia +
-				", promedioDeEsperaEnCola=" + promedioDeEsperaEnCola +
-				", promedioDeTiempoDeAtencion=" + promedioDeTiempoDeAtencion +
-				", porcentajeDeTiempoOcioso=" + porcentajeDeTiempoOcioso +
 				'}';
 	}
 

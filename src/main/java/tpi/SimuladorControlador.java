@@ -13,66 +13,116 @@ public class SimuladorControlador {
 	private Integer cantidadDeSubsistemas;
 	private List<Subsistema> subsistemas;
 	private Integer tiempoDeSimulacion;
-	private Integer tiempo;
-	private Integer tpll;
+	private Integer tiempoActual;
+	private Integer tiempoDeProximaLlegada;
 	
 	public SimuladorControlador() {
 		super();
 		this.simuladorServicio = new SimuladorServicio();
 		this.logueos = new ArrayList<Logueo>();
-		this.cantidadDeSubsistemas = 5;
 		this.subsistemas = new ArrayList<Subsistema>();
-		for (int i = 0; i < this.cantidadDeSubsistemas; i++) {
-			Subsistema subsistema = new Subsistema();
-			subsistema.setIdentificador(i + 1);
-			subsistema.setCantidadDePersonasQuePasaron(0);
-			subsistema.setCantidadDePersonas(0);
-			subsistema.setTiempoDeProximaSalida(Integer.MAX_VALUE);
-			subsistema.setSumatoriaDeTiempoDePermanencia(0);
-			subsistema.setSumatoriaDeTiempoDeAtencion(0);
-			subsistema.setSumatoriaDeTiempoOcioso(0);
-			subsistema.setComienzoDeTiempoOcioso(0);
-			subsistema.setPromedioDePermanencia(0F);
-			subsistema.setPromedioDeTiempoDeAtencion(0F);
-			subsistema.setPromedioDeEsperaEnCola(0F);
-			subsistema.setPorcentajeDeTiempoOcioso(0F);
-			subsistemas.add(subsistema);			
-		}
-		this.tiempoDeSimulacion = 20;
-		this.tiempo = 0;
-		this.tpll= 0;
+		this.tiempoActual = 0;
+		this.tiempoDeProximaLlegada= 0;
 		
 		
 	}
 	
-	public void ejecutar() {
-
-		this.logueoInicial = this.simuladorServicio.generarLogueoInicial();
+	public void ejecutar(Integer cantidadDeSubsistemas, Integer tiempoDeSimulacion) {
 		
-
+		this.tiempoDeSimulacion = tiempoDeSimulacion;
+		this.cantidadDeSubsistemas = cantidadDeSubsistemas;
+		this.subsistemas = this.simuladorServicio.inicializarSubsistemas(cantidadDeSubsistemas);
+		System.out.println("");
+		System.out.println("Ejecutando simulador con " + cantidadDeSubsistemas + " agentes y una duracion de " + tiempoDeSimulacion + " segundos.");
+		//this.logueoInicial = this.simuladorServicio.generarLogueoInicial();
+		System.out.println("Estado Inicial de los subsistemas");
+		this.simuladorServicio.imprimirSubsistemas(this.subsistemas);
+		System.out.println("");
 		
-		
+				
 		do {
 			
+			Logueo logueo = new Logueo(this.tiempoActual,"");
+			logueo.setTexto(logueo.getTexto().concat("INSTANTE " + this.tiempoActual + SALTO_DE_LINEA));
+			//System.out.println("INSTANTE " + this.tiempoActual + SALTO_DE_LINEA);
 			
-			Logueo logueo = new Logueo(this.tiempo,"");
+			Subsistema subsistemaConMenorTiempoDeProximaSalida = this.simuladorServicio.obtenerSubsistemaConMenorTiempoDeProximaSalida(this.subsistemas);
+			//System.out.println("Subsistema con menor tiempo de proxima salida: " + subsistemaConMenorTiempoDeProximaSalida);
 			
-			logueo.setTexto(logueo.getTexto().concat("INSTANTE " + this.tiempo) + SALTO_DE_LINEA );
-			
-			for (Subsistema subsistema : subsistemas) {
-				logueo.setTexto(logueo.getTexto().concat("Subsistema: " + subsistema.getIdentificador() + SALTO_DE_LINEA ));
+			if (this.tiempoDeProximaLlegada <= subsistemaConMenorTiempoDeProximaSalida.getTiempoDeProximaSalida()) {
+				//System.out.println("RAMA de Llegadas " + SALTO_DE_LINEA);
+				
+				this.subsistemas = this.simuladorServicio.actualizarSumatoriaDeTiempoDePermanencia(this.subsistemas, this.tiempoDeProximaLlegada, this.tiempoActual);
+				//System.out.println("Subsistemas con STP actualizado" + SALTO_DE_LINEA);
+				//this.simuladorServicio.imprimirSubsistemas(this.subsistemas);
+				
+				this.tiempoActual= this.tiempoDeProximaLlegada;
+				Integer intervaloEntreArribos= this.simuladorServicio.obtenerIntervaloEntreArribos();
+				//System.out.println("Intervalo entre arribos: " + intervaloEntreArribos + SALTO_DE_LINEA);
+				
+				this.tiempoDeProximaLlegada = this.tiempoDeProximaLlegada + intervaloEntreArribos;
+				
+				Subsistema subsistemaConMenorCantidadDePersonas = this.simuladorServicio.obtenerSubsistemaConMenorCantidadDePersonas(this.subsistemas);
+				//System.out.println("Subsistema con menor cantidad de personas: " + subsistemaConMenorCantidadDePersonas+ SALTO_DE_LINEA);
+				
+				subsistemaConMenorCantidadDePersonas.setCantidadDePersonas(subsistemaConMenorCantidadDePersonas.getCantidadDePersonas() + 1);
+				subsistemaConMenorCantidadDePersonas.setCantidadDePersonasQuePasaron(subsistemaConMenorCantidadDePersonas.getCantidadDePersonasQuePasaron() + 1);
+				//System.out.println("Subsistema con menor cantidad de personas con NS y N actualizado: " + subsistemaConMenorCantidadDePersonas + SALTO_DE_LINEA);
+				
+
+				if (subsistemaConMenorCantidadDePersonas.getCantidadDePersonas() == 1) {
+					Integer tiempoDeAtencion = this.simuladorServicio.obtenerTiempoDeAtencion();
+					//System.out.println("Tiempo de Atencion: " + tiempoDeAtencion + SALTO_DE_LINEA);
+					subsistemaConMenorCantidadDePersonas.setTiempoDeProximaSalida(this.tiempoActual + tiempoDeAtencion);
+					subsistemaConMenorCantidadDePersonas.setSumatoriaDeTiempoDeAtencion(subsistemaConMenorCantidadDePersonas.getSumatoriaDeTiempoDeAtencion() + tiempoDeAtencion);
+					subsistemaConMenorCantidadDePersonas.setSumatoriaDeTiempoOcioso(subsistemaConMenorCantidadDePersonas.getSumatoriaDeTiempoOcioso() + (this.tiempoActual - subsistemaConMenorCantidadDePersonas.getComienzoDeTiempoOcioso()));
+				}
+				
+				//System.out.println("Subsistema con menor cantidad de personas con TPS, STA y STO actualizados: " + subsistemaConMenorCantidadDePersonas + SALTO_DE_LINEA);
+				//System.out.println();
+				
+			} else {
+				//System.out.println("RAMA de Salidas " + SALTO_DE_LINEA);
+				
+				this.subsistemas = this.simuladorServicio.actualizarSumatoriaDeTiempoDePermanencia(this.subsistemas, subsistemaConMenorTiempoDeProximaSalida.getTiempoDeProximaSalida(), this.tiempoActual);
+				//System.out.println("Subsistemas con STP actualizado");
+				//this.simuladorServicio.imprimirSubsistemas(this.subsistemas);
+				
+				
+				this.tiempoActual= subsistemaConMenorTiempoDeProximaSalida.getTiempoDeProximaSalida();
+				
+				subsistemaConMenorTiempoDeProximaSalida.setCantidadDePersonas(subsistemaConMenorTiempoDeProximaSalida.getCantidadDePersonas() - 1);
+				
+				if (subsistemaConMenorTiempoDeProximaSalida.getCantidadDePersonas() >= 1) {
+					Integer tiempoDeAtencion = this.simuladorServicio.obtenerTiempoDeAtencion();
+					subsistemaConMenorTiempoDeProximaSalida.setTiempoDeProximaSalida(this.tiempoActual + tiempoDeAtencion);
+					subsistemaConMenorTiempoDeProximaSalida.setSumatoriaDeTiempoDeAtencion(subsistemaConMenorTiempoDeProximaSalida.getSumatoriaDeTiempoDeAtencion() + tiempoDeAtencion);					
+				} else {
+					subsistemaConMenorTiempoDeProximaSalida.setComienzoDeTiempoOcioso(this.tiempoActual);
+					subsistemaConMenorTiempoDeProximaSalida.setTiempoDeProximaSalida(Integer.MAX_VALUE);
+				}		
+				
 			}
-			
-			
+						
 			this.logueos.add(logueo);
-			this.tiempo++;
 			
-		} while(this.tiempo <= this.tiempoDeSimulacion);
+		} while(this.tiempoActual <= this.tiempoDeSimulacion);
 		
-		this.logueoFinal = this.simuladorServicio.generarLogueoFinal(this.tiempo);
+		System.out.println("Estado Final de los subsistemas");
+		this.simuladorServicio.imprimirSubsistemas(this.subsistemas);
+		
+		this.logueoFinal = this.simuladorServicio.generarLogueoFinal(this.tiempoActual, this.subsistemas);
 		
 	}
 		
+	public SimuladorServicio getSimuladorServicio() {
+		return simuladorServicio;
+	}
+
+	public void setSimuladorServicio(SimuladorServicio simuladorServicio) {
+		this.simuladorServicio = simuladorServicio;
+	}
+
 	public List<Logueo> getLogueos() {
 		return logueos;
 	}
